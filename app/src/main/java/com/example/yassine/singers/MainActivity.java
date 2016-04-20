@@ -1,4 +1,4 @@
-package com.example.yassine.yandextask;
+package com.example.yassine.singers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;

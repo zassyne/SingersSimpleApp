@@ -1,4 +1,4 @@
-package com.example.yassine.yandextask;
+package com.example.yassine.singers;
 
 import android.content.Context;
 import android.text.SpannableString;

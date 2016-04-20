@@ -1,4 +1,4 @@
-package com.example.yassine.yandextask;
+package com.example.yassine.singers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
