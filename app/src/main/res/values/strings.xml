@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">YandexTask</string>
+    <string name="mainActivityTitle">Singers</string>
+    <string name="activity_main_title">Исполнители</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="activity_detail_title"></string>
+
+</resources>
