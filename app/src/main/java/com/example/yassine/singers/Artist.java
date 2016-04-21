@@ -1,5 +1,10 @@
 package com.example.yassine.singers;
 
+import android.graphics.Bitmap;
+
+import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 

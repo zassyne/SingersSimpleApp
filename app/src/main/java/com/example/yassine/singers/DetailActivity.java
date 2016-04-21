@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.example.yassine.singers.Artist;
+import com.example.yassine.singers.R;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
@@ -31,9 +33,9 @@ public class DetailActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ImageView imageView;
     private TextView textView;
-    private Artist artist;
+    private com.example.yassine.singers.Artist artist;
 
-    private boolean isLandscape = false;
+    private boolean isPortrait = false;
 
     private TextView biographyTextView;
 
@@ -51,6 +53,7 @@ public class DetailActivity extends AppCompatActivity {
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
         DisplayMetrics dMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dMetrics);
@@ -59,7 +62,7 @@ public class DetailActivity extends AppCompatActivity {
         int height= Math.round(dMetrics.heightPixels/ density);
 
         if(width < height) {
-            isLandscape = true;
+            isPortrait = true;
         }
 
         imageView = (ImageView) findViewById(R.id.detail_image);
@@ -100,8 +103,11 @@ public class DetailActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        if(isLandscape)
+        if(isPortrait)
             Picasso.with(DetailActivity.this).load(artist.getBigCover()).resize(size.x, size.y/2).into(imageView);
+        else
+            Picasso.with(DetailActivity.this).load(artist.getBigCover()).resize(size.x, 2 * size.y/3).into(imageView);
+
         ArrayList<String> genres = artist.getGenres();
 
         toolbar.setTitle(spannableTitleString(artist.getName()));
@@ -118,16 +124,12 @@ public class DetailActivity extends AppCompatActivity {
 
 
         textView.setText(_genresPhrase);
-        biographyTextView.setText("Биография");
-
-        biographyTextView.append("\n\n");
         biographyTextView.append(artist.getDescription());
         String albumsAndSongs = "\n\n" + artist.getAlbums() + " альбомов" + "  -  " + artist.getTracks() + " песни";
         textView.append(albumsAndSongs);
 
         Button caption = (Button) findViewById(R.id.caption_image);
-        caption.setText("View official website");
-        caption.getBackground().setAlpha(120);
+        caption.setText(R.string.activity_detail_view_button);
         caption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

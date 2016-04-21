@@ -1,17 +1,27 @@
 package com.example.yassine.singers;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.example.yassine.singers.Artist;
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,13 +55,12 @@ public class MainActivity extends Activity {
         public ArtistsGetter(MainActivity activity) {
             progressDialog = new ProgressDialog(activity);
         }
+
         @Override
         protected void onPreExecute() {
             progressDialog.setMessage("Loading data ...");
             progressDialog.show();
         }
-
-
 
 
         @Override
@@ -69,29 +78,27 @@ public class MainActivity extends Activity {
 
         private void parseJSON(String json, ArrayList<Artist> artists) {
 
-            if(json == null || json.isEmpty()) {
+            if (json == null || json.isEmpty()) {
                 Log.d(TAG, "JSON text is null");
 
                 try {
                     artistsList = (ArrayList<Artist>) CacheHelper.readObject(MainActivity.this, MainActivity.fileName_cache);
-                }
-                catch(IOException exception) {
+                } catch (IOException exception) {
                     exception.printStackTrace();
-                }
-                catch(ClassNotFoundException exception) {
+                } catch (ClassNotFoundException exception) {
                     Log.e(TAG, exception.getMessage());
                 }
 
-                return ;
+                return;
             }
             try {
 
                 JSONArray jsonArray = new JSONArray(json);
 
-                String id = "", name="", small = "", big = "", description="", link="";
+                String id = "", name = "", small = "", big = "", description = "", link = "";
                 int tracks, albums;
-                int i=0;
-                for(i = 0; i<jsonArray.length(); i++) {
+                int i = 0;
+                for (i = 0; i < jsonArray.length(); i++) {
                     JSONObject ob = jsonArray.getJSONObject(i);
 
                     id = ob.getString("id");
@@ -101,11 +108,11 @@ public class MainActivity extends Activity {
 
                     JSONArray _genres = ob.getJSONArray("genres");
                     ArrayList<String> genres = new ArrayList<>();
-                    for(int t = 0; t<_genres.length(); t++)
+                    for (int t = 0; t < _genres.length(); t++)
                         genres.add(_genres.getString(t));
 
 
-                    JSONObject _covers= ob.getJSONObject("cover");
+                    JSONObject _covers = ob.getJSONObject("cover");
                     ArrayList<String> covers = new ArrayList<>();
                     covers.add(_covers.getString("small"));
                     covers.add(_covers.getString("big"));
@@ -115,11 +122,12 @@ public class MainActivity extends Activity {
                         big = covers.get(1);
                         description = ob.getString("description");
                         link = ob.getString("link");
-                    }
-                    catch(Exception e) {
+                    } catch (Exception e) {
 
                     }
 
+                    //Bitmap smallCover = Picasso.with(MainActivity.this).load(small).get();
+                    //Bitmap bigCover = Picasso.with(MainActivity.this).load(big).get();
                     Artist artist = new Artist.ArtistBuilder(id, name)
                             .genres(genres)
                             .tracks(tracks)
@@ -133,7 +141,7 @@ public class MainActivity extends Activity {
                     artistsList.add(artist);
                 }
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
             try {
@@ -145,10 +153,11 @@ public class MainActivity extends Activity {
 
         }
 
-        @Override
-        protected  void onPostExecute(Void result) {
 
-            if(progressDialog.isShowing()) {
+        @Override
+        protected void onPostExecute(Void result) {
+
+            if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
 
@@ -160,19 +169,37 @@ public class MainActivity extends Activity {
             ls.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Artist artist = artistsList.get(position);
+                    /*Artist artist = artistsList.get(position);
                     Intent i = new Intent(MainActivity.this, DetailActivity.class);
 
                     i.putExtra("artist", artist);
                     startActivity(i);
+*/
+                    // use a fragment instead .
+                    FragmentManager fragmentManager = getFragmentManager();
+                    DetailFragment fragment = (DetailFragment) fragmentManager.findFragmentById(R.id.fragmentContainer);
+                    FragmentTransaction transaction = MainActivity.this.getFragmentManager().beginTransaction();
+                    if (fragment != null) {
+                        transaction.remove(fragment).commit();
+                    }
+
+                    fragment = new DetailFragment();
+                    Bundle args = new Bundle();
+                    args.putSerializable("artist", artistsList.get(position));
+                    fragment.setArguments(args);
+                    transaction = MainActivity.this.getFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragmentContainer, fragment);
+                    //transaction.addToBackStack(null);
+
+                    transaction.commit();
+
                 }
             });
 
 
-
-
         }
     }
+
     private static class CacheHelper {
 
         public static void writeObject(Context context, String fileName, Object object) throws IOException {
@@ -198,11 +225,26 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
-        artistsList = new ArrayList<>();
+
+        if (savedInstanceState != null)
+            artistsList = (ArrayList<Artist>) savedInstanceState.getSerializable("artists");
+
+        else {
+            artistsList = new ArrayList<>();
+        }
 
         new ArtistsGetter(this).execute();
+
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+        @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putSerializable("artists", artistsList);
 
     }
 }

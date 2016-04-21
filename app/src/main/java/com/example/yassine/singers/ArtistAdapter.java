@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.yassine.singers.Artist;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -70,8 +71,14 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
         TextView textView = (TextView) rowView.findViewById(R.id.label);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
 
-        Picasso.with(context).load(artists.get(position).getSmallCover()).into(imageView);
+        /*try {
+            artists.get(position).getCover().setSmallCover(Picasso.with(context).load(artists.get(position).getSmall()).get());
+        } catch(Exception e) {
 
+         }*/
+        //Picasso.with(context).load(artists.get(position).getSmall()).into(imageView);
+
+         Picasso.with(context).load(artists.get(position).getSmallCover()).into(imageView);
         contentTextViewSetter(textView, position);
 
 
