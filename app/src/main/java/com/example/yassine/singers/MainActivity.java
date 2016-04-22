@@ -161,7 +161,7 @@ public class MainActivity extends Activity {
                 progressDialog.dismiss();
             }
 
-            ListView ls = (ListView) MainActivity.this.findViewById(R.id.artists_list);
+            final ListView ls = (ListView) MainActivity.this.findViewById(R.id.artists_list);
 
             ls.setAdapter(new ArtistAdapter(MainActivity.this, R.layout.activity_main_list, artistsList));
 
@@ -175,21 +175,23 @@ public class MainActivity extends Activity {
                     i.putExtra("artist", artist);
                     startActivity(i);
 */
+
                     // use a fragment instead .
                     FragmentManager fragmentManager = getFragmentManager();
                     DetailFragment fragment = (DetailFragment) fragmentManager.findFragmentById(R.id.fragmentContainer);
                     FragmentTransaction transaction = MainActivity.this.getFragmentManager().beginTransaction();
-                    if (fragment != null) {
-                        transaction.remove(fragment).commit();
-                    }
 
+                    if (fragment != null) {
+                        //transaction.remove(fragment).commit();
+                        fragmentManager.popBackStack();
+                    }
                     fragment = new DetailFragment();
+
                     Bundle args = new Bundle();
                     args.putSerializable("artist", artistsList.get(position));
                     fragment.setArguments(args);
-                    transaction = MainActivity.this.getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragmentContainer, fragment);
-                    //transaction.addToBackStack(null);
+                    transaction = MainActivity.this.getFragmentManager().beginTransaction().setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit).replace(R.id.fragmentContainer, fragment);
+                    transaction.addToBackStack(null);
 
                     transaction.commit();
 
